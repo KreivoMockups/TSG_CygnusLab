@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSG | Laboratorio de Política Pública y Gobernanza</title>
+    <style>
+        :root {
+            --tsg-blue: #003366;
+            --tsg-light-blue: #3498db;
+            --tsg-accent: #e74c3c;
+            --tsg-success: #2ecc71;
+            --bg-color: #f4f7f6;
+            --text-main: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .header h2 { color: var(--tsg-blue); margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
+
+        .presentation-window {
+            background: #ffffff; width: 80%; max-width: 1100px; height: 75vh;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative; overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        .slide {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            padding: 40px; box-sizing: border-box;
+            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+            opacity: 0; transform: translateX(100%); display: flex; flex-direction: column;
+        }
+        .slide.active { opacity: 1; transform: translateX(0); z-index: 10; }
+        .slide.previous { transform: translateX(-100%); z-index: 5; }
+
+        h1 { color: var(--tsg-blue); border-bottom: 2px solid var(--tsg-light-blue); padding-bottom: 10px; margin-top: 0; flex-shrink: 0; font-size: 1.8rem; }
+
+        .content-split { display: flex; justify-content: space-between; flex-grow: 1; margin-top: 20px; height: calc(100% - 70px); overflow: hidden; }
+
+        .text-section { width: 50%; display: flex; flex-direction: column; justify-content: flex-start; overflow-y: auto; padding-right: 20px; }
+        .text-section::-webkit-scrollbar { width: 6px; }
+        .text-section::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .text-section::-webkit-scrollbar-thumb { background: var(--tsg-light-blue); border-radius: 4px; }
+
+        .visual-section {
+            width: 45%; background: #ecf0f1; border-radius: 8px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; position: relative; padding: 20px; box-sizing: border-box; overflow-y: auto;
+        }
+
+        #slide-3 .visual-section, #slide-6 .visual-section, #slide-7 .visual-section {
+            justify-content: flex-start; padding-top: 40px; padding-bottom: 40px;
+        }
+        .visual-section::-webkit-scrollbar { width: 6px; }
+        .visual-section::-webkit-scrollbar-track { background: transparent; }
+        .visual-section::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 4px; }
+
+        .tech-img { max-width: 90%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 15px; border: 2px solid var(--tsg-blue); }
+
+        .hook-text { font-size: 1.6rem; color: var(--tsg-blue); font-weight: 600; line-height: 1.4; }
+        .highlight { color: var(--tsg-light-blue); }
+        .warning { color: var(--tsg-accent); font-weight: bold; }
+
+        .btn { background-color: var(--tsg-light-blue); color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 6px; cursor: pointer; transition: all 0.3s; margin-top: 15px; font-weight: bold; }
+        .btn:hover { background-color: var(--tsg-blue); }
+
+        /* Tablas Financieras */
+        .roi-table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .roi-table th { background: var(--tsg-blue); color: white; padding: 12px; text-align: left; }
+        .roi-table td { padding: 12px; border-bottom: 1px solid #ddd; }
+        .roi-table tr:last-child td { border-bottom: none; }
+        .roi-table tr:nth-child(even) { background-color: #f9f9f9; }
+
+        /* Diagrama Arquitectura */
+        .arch-node { background: var(--tsg-blue); color: white; padding: 10px 20px; border-radius: 20px; margin: 10px 0; text-align: center; width: 80%; opacity: 0.5; transition: all 0.5s; }
+        .arch-node.active-node { opacity: 1; transform: scale(1.05); background: var(--tsg-success); box-shadow: 0 0 15px var(--tsg-success); }
+        .arrow { color: var(--tsg-blue); font-size: 24px; margin: -5px 0; transition: color 0.3s; }
+
+        /* Roadmap Elements */
+        .roadmap-card { background: #fff; border-left: 4px solid var(--tsg-light-blue); padding: 15px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .no-do-box { background: #feeae9; border-left: 4px solid var(--tsg-accent); padding: 15px; margin-top: 15px; border-radius: 4px; }
+        
+        .controls { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 100; }
+        .controls button { background-color: var(--tsg-blue); color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; transition: background-color 0.3s; }
+        .controls button:hover { background-color: var(--tsg-light-blue); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_ApprovalStatus msdt:dt="string">0</mso:_ApprovalStatus>
+<mso:_ApprovalAssignedTo msdt:dt="string"></mso:_ApprovalAssignedTo>
+<mso:_ApprovalRespondedBy msdt:dt="string"></mso:_ApprovalRespondedBy>
+<mso:_ApprovalSentBy msdt:dt="string"></mso:_ApprovalSentBy>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body>
+
+    <div class="header">
+        <h2>TSG | <span style="font-weight: 300;">The IT Experts</span></h2>
+        <span style="color: var(--tsg-light-blue); font-weight: bold;">R&D: Laboratorio de Gobernanza</span>
+    </div>
+
+    <div class="presentation-window">
+        
+        <!-- SLIDE 1: EL DOLOR Y LA OPORTUNIDAD B2G -->
+        <div class="slide active" id="slide-1">
+            <h1>De Monitoreo Pasivo a Monetización Activa</h1>
+            <div class="content-split">
+                <div class="text-section" style="width: 100%; justify-content: center;">
+                    <div class="hook-text" style="text-align: center;">
+                        El gobierno y nuestros clientes ya pagaron por los sensores.<br>
+                        Nosotros vamos a venderles <span class="highlight">las decisiones.</span>
+                    </div>
+                    <p style="font-size: 1.1rem; color: #555; margin-top: 30px;">
+                        Hoy tenemos el <strong>Proyecto Cygnus</strong> monitoreando infraestructura de Claro (UPS, Servidores). Pero nos estamos limitando a <em>mirar</em> los datos. El costo de no evolucionar es quedarnos como proveedores de infraestructura (commodity), dejando sobre la mesa millones en contratos de optimización operativa.
+                    </p>
+                    <div style="display: flex; justify-content: space-around; margin-top: 20px; gap: 15px;">
+                        <div style="background: #e8f8f5; padding: 15px; border-radius: 8px; flex: 1;">
+                            <span style="color: var(--tsg-success); font-weight: bold;">Nuestra Ventaja Injusta:</span><br>
+                            Los contactos estratégicos del CEO nos permiten rescatar implementaciones IoT subutilizadas del gobierno y aplicarles nuestra capa analítica.
+                        </div>
+                        <div style="background: #feeae9; padding: 15px; border-radius: 8px; flex: 1;">
+                            <span class="warning">El Riesgo Real:</span><br>
+                            Si no somos nosotros quienes le den inteligencia a esa infraestructura B2G, una empresa de software puro lo hará en los próximos 12 meses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: QUICK WIN & EXPANSIÓN -->
+        <div class="slide" id="slide-2">
+            <h1>El Piloto Cygnus y Expansión</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <h3 style="color: var(--tsg-blue);">Fase 1: Quick Win Interno (90 días)</h3>
+                    <p><strong>El Piloto:</strong> Tomamos la telemetría actual de Cygnus (UPS de Claro). Aplicamos Investigación de Operaciones para predecir fallas y balancear cargas antes de la caída del nodo.</p>
+                    <p><em>Riesgo Financiero: Casi cero. Usamos la data e infraestructura que ya poseemos.</em></p>
+                    
+                    <h3 style="color: var(--tsg-blue); margin-top: 30px;">Fase 2: El Salto B2G (Smart Cities)</h3>
+                    <p>Con el modelo probado en casa, el CEO tiene la herramienta para ir al gobierno. Llevaremos este modelo a:</p>
+                    <ul>
+                        <li>Redes Eléctricas Ciudadanas.</li>
+                        <li>Semaforización Dinámica.</li>
+                        <li>Prevención de Inseguridad Pública.</li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <div style="background: white; padding: 20px; border-radius: 8px; width: 80%; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <h3 style="margin-top: 0; color: var(--tsg-accent);">De la Infraestructura al SaaS</h3>
+                        <p style="font-size: 1.1rem; color: #555;">No cobramos por el sensor.<br>Cobramos una mensualidad por la reducción del 18% en los tiempos muertos de la línea operativa.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: HOW STAGE (CAPA DE VALOR) -->
+        <div class="slide" id="slide-3">
+            <h1>Flujo de Valor: Capa sobre IT</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <h3>No competimos con IT, lo potenciamos</h3>
+                    <p>El Laboratorio es una capa de inteligencia de negocio. Tomamos el dato bruto que ya gestiona IT y lo convertimos en un actuador físico que ahorra dinero.</p>
+                    <button class="btn" onclick="animateArchitecture()">Simular Flujo del Laboratorio</button>
+                </div>
+                <div class="visual-section">
+                    <div class="arch-node" id="node-1">1. Cygnus / Sensores Estado</div>
+                    <div class="arrow" id="arrow-1">↓</div>
+                    <div class="arch-node" id="node-2">2. Ingesta IT Existente</div>
+                    <div class="arrow" id="arrow-2">↓</div>
+                    <div class="arch-node" id="node-3" style="background: var(--tsg-accent);">3. Modelos OR (El Laboratorio)</div>
+                    <div class="arrow" id="arrow-3">↓</div>
+                    <div class="arch-node" id="node-4">4. Decisión Financiera / Física</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: ROI (TABLA EJECUTIVA) -->
+        <div class="slide" id="slide-4">
+            <h1>Caso de Negocio y ROI (Piloto Expansión)</h1>
+            <div class="content-split">
+                <div class="text-section" style="width: 100%;">
+                    <p>Proyección financiera basada en un despliegue estándar de optimización de nodos logísticos o energéticos a 12 meses.</p>
+                    
+                    <table class="roi-table">
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Escenario Conservador</th>
+                                <th>Escenario Esperado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Inversión Piloto (OPEX)</strong></td>
+                                <td>$30.000 USD (Horas ingeniería)</td>
+                                <td>$30.000 USD</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Reducción de Fallas Operativas</strong></td>
+                                <td>15%</td>
+                                <td>25% - 30%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ahorro Anual (Multas / Mantenimiento)</strong></td>
+                                <td>$120.000 USD</td>
+                                <td>$350.000 USD</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Payback (Retorno)</strong></td>
+                                <td><strong>4 Meses</strong></td>
+                                <td><strong>1.5 Meses</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="font-size: 0.9rem; color: #7f8c8d; margin-top: 15px;">*Supuestos: Basado en infraestructura de sensores pre-existente (CAPEX 0 en hardware inicial).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: REGLAS DE JUEGO Y ROADMAP -->
+        <div class="slide" id="slide-5">
+            <h1>Roadmap y Foco Estratégico</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <h3 style="color: var(--tsg-blue); margin-top:0;">Entregables a 6 Meses</h3>
+                    <ol style="line-height: 1.6;">
+                        <li><strong>Piloto Cygnus en Producción:</strong> 1 modelo predictivo activo.</li>
+                        <li><strong>1 Caso de Uso B2G Estructurado:</strong> Listo para presentación al gobierno.</li>
+                        <li><strong>Adopción Cultural:</strong> 2 capacitaciones al equipo operativo para asegurar uso real del modelo.</li>
+                    </ol>
+                    
+                    <div class="no-do-box">
+                        <strong style="color: var(--tsg-accent);">LO QUE NO VAMOS A HACER:</strong>
+                        <ul style="margin-top: 5px; margin-bottom: 0;">
+                            <li>No haremos investigación académica sin impacto financiero.</li>
+                            <li>No reemplazaremos la arquitectura actual de IT.</li>
+                            <li>No compraremos hardware a menos que un contrato SaaS lo justifique.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="visual-section" style="justify-content: center;">
+                    <h3 style="margin-top: 0; color: var(--tsg-blue);">Responsabilidad del Valor</h3>
+                    <div style="background: white; padding: 15px; border-radius: 8px; width: 90%; text-align: center; border: 2px solid var(--tsg-blue);">
+                        <strong>Value Owner Técnico:</strong><br>Head de R&D (Ingeniería y ROI del modelo).
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 10px 0;">
+                        <strong>Sponsor Ejecutivo:</strong><br>CEO (Gestión B2G y apertura comercial).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: ANEXO TÉCNICO - LA SITUACIÓN -->
+        <div class="slide" id="slide-6">
+            <h1>Deep Dive B2G: Identificación de Riesgo</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <ul style="padding-left: 20px; margin-top: 0;">
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-accent); margin-bottom: 5px;">1. Fusión Multimodal</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Ingesta en tiempo real de telemetría gubernamental: densidad de tráfico, conexiones móviles y umbrales acústicos.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-accent); margin-bottom: 5px;">2. Modelado Espacio-Temporal</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">El algoritmo calcula la probabilidad de un incidente. Genera un mapa de calor dinámico, alertando en <strong style="color: var(--tsg-accent);">rojo</strong> los cuadrantes críticos.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <img src="img/moto_robo.jpg" alt="Situación de hurto en motocicleta" class="tech-img">
+                    <img src="img/mapa_calor_rojo.png" alt="Mapa de calor con puntos rojos" class="tech-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: ANEXO TÉCNICO - LA SOLUCIÓN -->
+        <div class="slide" id="slide-7">
+            <h1>Deep Dive B2G: Mitigación Activa</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <ul style="padding-left: 20px; margin-top: 0;">
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-success); margin-bottom: 5px;">3. Optimización (Vehicle Routing)</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Asignación autónoma de la patrulla más cercana con la trayectoria óptima para disuadir en tiempo récord.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-success); margin-bottom: 5px;">4. Intervención Física del Entorno</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">El laboratorio envía comandos IoT a la ciudad: encendido preventivo de reflectores y balizas. El mapa transiciona a <strong style="color: var(--tsg-success);">verde</strong>.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <img src="img/moto_patrulla.jpg" alt="Motocicleta de patrulla policial" class="tech-img">
+                    <img src="img/mapa_calor_verde.jpg" alt="Mapa de calor mitigado" class="tech-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: LA DECISIÓN EJECUTIVA (EL CIERRE) -->
+        <div class="slide" id="slide-8">
+            <h1>El Ask (Decisión Solicitada)</h1>
+            <div class="content-split">
+                <div class="text-section" style="width: 100%;">
+                    <p style="font-size: 1.3rem; text-align: center; color: var(--tsg-blue); margin-bottom: 40px;">
+                        No estamos proponiendo un área técnica. Estamos proponiendo una capacidad estratégica para facturar gobernanza.<br><strong>Para iniciar mañana, necesitamos:</strong>
+                    </p>
+                    <div style="display: flex; justify-content: space-around; width: 100%;">
+                        <div style="width: 30%; background: #ecf0f1; padding: 20px; border-radius: 8px; border-bottom: 5px solid var(--tsg-accent);">
+                            <h2 style="color: var(--tsg-blue); text-align: center; margin-top: 0;">1. Aprobación Piloto</h2>
+                            <p style="text-align: center;">Luz verde para iniciar la optimización de los sensores actuales de <strong>Cygnus</strong> (90 días de ejecución).</p>
+                        </div>
+                        <div style="width: 30%; background: #ecf0f1; padding: 20px; border-radius: 8px; border-bottom: 5px solid var(--tsg-success);">
+                            <h2 style="color: var(--tsg-blue); text-align: center; margin-top: 0;">2. Sponsorship CEO</h2>
+                            <p style="text-align: center;">El compromiso de la dirección para apalancar el caso de éxito de Cygnus en <strong>licitaciones y negociaciones B2G</strong>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Controles de Navegación -->
+    <div class="controls">
+        <button onclick="prevSlide()">❮ Anterior</button>
+        <button onclick="nextSlide()">Siguiente ❯</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 8;
+
+        function updateSlides() {
+            for (let i = 1; i <= totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (i === currentSlide) {
+                    slide.className = 'slide active';
+                } else if (i < currentSlide) {
+                    slide.className = 'slide previous';
+                } else {
+                    slide.className = 'slide';
+                }
+            }
+        }
+
+        function nextSlide() { if (currentSlide < totalSlides) { currentSlide++; updateSlides(); } }
+        function prevSlide() { if (currentSlide > 1) { currentSlide--; updateSlides(); } }
+
+        function animateArchitecture() {
+            const nodes = [1, 2, 3, 4];
+            let delay = 0;
+            nodes.forEach(n => document.getElementById(`node-${n}`).classList.remove('active-node'));
+            document.getElementById('node-3').style.background = 'var(--tsg-accent)';
+            nodes.forEach((n) => {
+                setTimeout(() => {
+                    document.getElementById(`node-${n}`).classList.add('active-node');
+                    if(n === 3) document.getElementById('node-3').style.background = 'var(--tsg-success)';
+                }, delay);
+                delay += 800; 
+            });
+        }
+    </script>
+</body>
+</html>
