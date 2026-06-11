@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSG | Laboratorio de Política Pública y Gobernanza</title>
+    <style>
+        :root {
+            --tsg-blue: #003366;
+            --tsg-light-blue: #3498db;
+            --tsg-accent: #e74c3c;
+            --tsg-success: #2ecc71;
+            --bg-color: #f4f7f6;
+            --text-main: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .header h2 {
+            color: var(--tsg-blue);
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        /* Estilos para las imágenes del Anexo Técnico */
+        .tech-img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            border: 2px solid var(--tsg-blue);
+        }
+
+        .presentation-window {
+            background: #ffffff;
+            width: 80%;
+            max-width: 1000px;
+            height: 65vh;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+            transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+            opacity: 0;
+            transform: translateX(100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+            z-index: 10;
+        }
+
+        .slide.previous {
+            transform: translateX(-100%);
+            z-index: 5;
+        }
+
+        h1 {
+            color: var(--tsg-blue);
+            border-bottom: 2px solid var(--tsg-light-blue);
+            padding-bottom: 10px;
+            margin-top: 0;
+            flex-shrink: 0;
+        }
+
+        .content-split {
+            display: flex;
+            justify-content: space-between;
+            flex-grow: 1;
+            margin-top: 20px;
+            height: calc(100% - 70px); /* Asegura que el contenedor respete los límites para el scroll */
+            overflow: hidden;
+        }
+
+        .text-section {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow-y: auto; /* Habilita el scroll vertical */
+            padding-right: 20px; /* Espacio para la barra de scroll */
+        }
+
+        /* Estilos personalizados para el scroll de la sección de texto */
+        .text-section::-webkit-scrollbar {
+            width: 6px;
+        }
+        .text-section::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        .text-section::-webkit-scrollbar-thumb {
+            background: var(--tsg-light-blue); 
+            border-radius: 4px;
+        }
+        .text-section::-webkit-scrollbar-thumb:hover {
+            background: var(--tsg-blue); 
+        }
+
+        .visual-section {
+            width: 45%;
+            background: #ecf0f1;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto; /* Scroll también para elementos visuales largos */
+        }
+
+        .visual-section::-webkit-scrollbar { width: 6px; }
+        .visual-section::-webkit-scrollbar-track { background: transparent; }
+        .visual-section::-webkit-scrollbar-thumb { background: #bdc3c7; border-radius: 4px; }
+
+        .hook-text {
+            font-size: 1.8rem;
+            color: var(--tsg-blue);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            color: var(--tsg-light-blue);
+        }
+
+        .btn {
+            background-color: var(--tsg-light-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: var(--tsg-blue);
+        }
+
+        /* Benchmark Use Cases Interactive Elements */
+        .use-case-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .btn-use-case {
+            background: #fff;
+            border: 2px solid var(--tsg-blue);
+            color: var(--tsg-blue);
+            text-align: left;
+            padding: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-use-case:hover, .btn-use-case.active-case {
+            background: var(--tsg-blue);
+            color: #fff;
+        }
+
+        .benchmark-display {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--tsg-accent);
+            display: none;
+            width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .benchmark-display.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        /* Architecture Diagram (How Stage) */
+        .arch-node {
+            background: var(--tsg-blue);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin: 10px 0;
+            text-align: center;
+            width: 80%;
+            opacity: 0.5;
+            transition: all 0.5s;
+        }
+
+        .arch-node.active-node {
+            opacity: 1;
+            transform: scale(1.05);
+            background: var(--tsg-success);
+            box-shadow: 0 0 15px var(--tsg-success);
+        }
+
+        .arrow {
+            color: var(--tsg-blue);
+            font-size: 24px;
+            margin: -5px 0;
+            transition: color 0.3s;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .controls button {
+            background-color: var(--tsg-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .controls button:hover {
+            background-color: var(--tsg-light-blue);
+        }
+
+        /* Corrección de scroll para los diagramas e imágenes largas */
+        #slide-3 .visual-section, 
+        #slide-6 .visual-section, 
+        #slide-7 .visual-section {
+            justify-content: flex-start; 
+            padding-top: 40px; 
+            padding-bottom: 40px; 
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:_ApprovalStatus msdt:dt="string">0</mso:_ApprovalStatus>
+<mso:_ApprovalAssignedTo msdt:dt="string"></mso:_ApprovalAssignedTo>
+<mso:_ApprovalRespondedBy msdt:dt="string"></mso:_ApprovalRespondedBy>
+<mso:_ApprovalSentBy msdt:dt="string"></mso:_ApprovalSentBy>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body>
+
+    <div class="header">
+        <h2>TSG | <span style="font-weight: 300;">The IT Experts</span></h2>
+        <span style="color: var(--tsg-light-blue); font-weight: bold;">Smart Cities R&D</span>
+    </div>
+
+    <div class="presentation-window">
+        
+        <!-- SLIDE 1: HOOK -->
+        <div class="slide active" id="slide-1">
+            <h1>El Propósito</h1>
+            <div class="content-split">
+                <div class="text-section" style="width: 100%; text-align: center; justify-content: center;">
+                    <div class="hook-text">
+                        ¿Qué pasaría si la ciudad no solo hablara,<br> sino que nosotros pudiéramos <span class="highlight">responderle en tiempo real?</span>
+                    </div>
+                    <p style="font-size: 1.2rem; color: #555; margin-top: 30px;">
+                        Actualmente somos expertos en monitorear sensores y predecir fallas (Monitoreo Pasivo).<br>
+                        El próximo paso evolutivo de TSG es construir el <strong>Laboratorio de Gobernanza y Política Pública</strong>.
+                    </p>
+                    <p style="font-size: 1.1rem; color: #7f8c8d;">
+                        <em>Transformar el dato en decisiones automatizadas usando Investigación de Operaciones.</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: BENCHMARK / USE CASES -->
+        <div class="slide" id="slide-2">
+            <h1>Benchmark y Casos de Uso</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <p>Aplicaciones tangibles para la toma de decisiones en Smart Cities:</p>
+                    <div class="use-case-buttons">
+                        <button class="btn-use-case" onclick="showBenchmark('energia', this)">1. Redes Eléctricas (El Gancho)</button>
+                        <button class="btn-use-case" onclick="showBenchmark('movilidad', this)">2. Movilidad y Tráfico (La Escala)</button>
+                        <button class="btn-use-case" onclick="showBenchmark('seguridad', this)">3. Seguridad Pública (La Visión)</button>
+                    </div>
+                </div>
+                
+                <div class="visual-section">
+                    <div id="bench-energia" class="benchmark-display" style="border-left-color: var(--tsg-accent);">
+                        <h3>Energía: Optimización de Recursos</h3>
+                        <p><strong>Operación:</strong> Predecir picos de consumo entre industria y zonas residenciales.</p>
+                        <p><strong>Acción Lab:</strong> El modelo instruye a la red inteligente para redirigir cargas dinámicamente antes de una sobrecarga local.</p>
+                    </div>
+                    <div id="bench-movilidad" class="benchmark-display" style="border-left-color: var(--tsg-light-blue);">
+                        <h3>Movilidad: Redes Dinámicas</h3>
+                        <p><strong>Operación:</strong> Visión artificial y Teoría de Colas evalúan densidad vehicular en tiempo real.</p>
+                        <p><strong>Acción Lab:</strong> Modificación autónoma del minutero de semáforos para disolver cuellos de botella antes de que paralicen la malla vial.</p>
+                    </div>
+                    <div id="bench-seguridad" class="benchmark-display" style="border-left-color: var(--tsg-blue);">
+                        <h3>Seguridad Pública: Prevención</h3>
+                        <p><strong>Operación:</strong> Modelado espacio-temporal de patrones de comportamiento (acústica, movimientos).</p>
+                        <p><strong>Acción Lab:</strong> Activación preventiva de iluminación pública inteligente o alertas disuasivas en zonas con 85%+ de probabilidad de incidentes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: HOW STAGE (CORE) -->
+        <div class="slide" id="slide-3">
+            <h1>El Núcleo (Cómo lo hacemos)</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <h3>IoT Bidireccional + Investigación de Operaciones</h3>
+                    <p>No almacenamos datos para que un operador los lea mañana. Procesamos en tiempo real para que el algoritmo decida hoy.</p>
+                    <button class="btn" onclick="animateArchitecture()">Simular Flujo del Laboratorio</button>
+                </div>
+                
+                <div class="visual-section" style="background: transparent;">
+                    <div class="arch-node" id="node-1">1. Sensores IoT (Borde)</div>
+                    <div class="arrow" id="arrow-1">↓</div>
+                    <div class="arch-node" id="node-2">2. Ingesta de Datos (TSG Cloud)</div>
+                    <div class="arrow" id="arrow-2">↓</div>
+                    <div class="arch-node" id="node-3" style="background: var(--tsg-accent);">3. Modelos OR / Analítica</div>
+                    <div class="arrow" id="arrow-3">↓</div>
+                    <div class="arch-node" id="node-4">4. Actuadores (Decisión a la Ciudad)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: WHAT STAGE (VALUE) - AHORA CON SCROLL Y ARGUMENTOS DEL GUION -->
+        <div class="slide" id="slide-4">
+            <h1>El Valor del Proyecto (Qué logramos)</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <ul style="padding-left: 20px; margin-top: 0;">
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-blue); margin-bottom: 5px;">Diferenciador de Mercado</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Dejar de competir en precio (commodity) instalando solo sensores. Pasamos a vender <strong>Gobernanza Automatizada</strong>, convirtiendo a TSG en socios estratégicos bajo modelos SaaS y consultoría B2G de alto margen.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-blue); margin-bottom: 5px;">Reducción de Costos (ROI Inmediato)</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Pasar del mantenimiento correctivo a la orquestación autónoma. Redistribuir recursos físicos en milisegundos puede ahorrar hasta un 30% en gastos operativos de la ciudad y evitar paradas de servicio.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-blue); margin-bottom: 5px;">Política Pública Basada en Datos</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Reemplazar la intuición y el sesgo político con <strong>certeza matemática</strong>. Permitimos simulaciones rigurosas de escenarios urbanos antes de que el gobierno invierta millones en infraestructura.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <h2 style="color: var(--tsg-success); font-size: 3rem; margin: 0;">SaaS + B2G</h2>
+                    <p style="text-align: center; font-size: 1.2rem;">Impacto medible, alta rentabilidad y consolidación de TSG como referente en analítica urbana.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: CONCLUSIONS -->
+        <div class="slide" id="slide-5">
+            <h1>Conclusiones y Siguientes Pasos</h1>
+            <div class="content-split">
+                <div class="text-section" style="width: 100%; display: flex; flex-direction: row; justify-content: space-around; flex-wrap: wrap; gap: 20px; align-items: flex-start;">
+                    <div style="flex: 1 1 30%; background: #ecf0f1; padding: 20px; border-radius: 8px; box-sizing: border-box;">
+                        <h3 style="color: var(--tsg-blue); text-align: center; margin-top: 0;">Fase 1: Aprobación</h3>
+                        <p style="text-align: center;">Luz verde para la unidad R&D de Laboratorio de Gobernanza.</p>
+                    </div>
+                    <div style="flex: 1 1 30%; background: #ecf0f1; padding: 20px; border-radius: 8px; box-sizing: border-box;">
+                        <h3 style="color: var(--tsg-light-blue); text-align: center; margin-top: 0;">Fase 2: Prototipo</h3>
+                        <p style="text-align: center;">Despliegue del algoritmo de benchmark en redes eléctricas simuladas.</p>
+                    </div>
+                    <div style="flex: 1 1 30%; background: #ecf0f1; padding: 20px; border-radius: 8px; box-sizing: border-box;">
+                        <h3 style="color: var(--tsg-accent); text-align: center; margin-top: 0;">Fase 3: Integración</h3>
+                        <p style="text-align: center;">Conectar el modelo a la suite de Smart Cities existente de TSG.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: ANEXO TÉCNICO - LA SITUACIÓN -->
+        <div class="slide" id="slide-6">
+            <h1>Anexo Técnico: Identificación de Riesgo</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <ul style="padding-left: 20px; margin-top: 0;">
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-accent); margin-bottom: 5px;">1. Fusión Multimodal de Parámetros</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">Ingesta en tiempo real de telemetría: densidad de tráfico (LPR), concurrencia peatonal (conexiones celulares) y umbrales acústicos (motores a altas RPM). Todo cruzado con data histórica.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-accent); margin-bottom: 5px;">2. Modelado Espacio-Temporal</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">El algoritmo procesa la probabilidad estadística de un incidente en la próxima hora. El resultado es un mapa de calor que identifica en <strong style="color: var(--tsg-accent);">rojo</strong> los cuadrantes críticos donde convergen la oportunidad y el riesgo.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <img src="img/moto_robo.jpg" alt="Situación de hurto en motocicleta" class="tech-img">
+                    <img src="img/mapa_calor_rojo.png" alt="Mapa de calor con puntos rojos" class="tech-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: ANEXO TÉCNICO - LA SOLUCIÓN -->
+        <div class="slide" id="slide-7">
+            <h1>Anexo Técnico: Mitigación Activa</h1>
+            <div class="content-split">
+                <div class="text-section">
+                    <ul style="padding-left: 20px; margin-top: 0;">
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-success); margin-bottom: 5px;">3. Optimización y Asignación (OR)</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">El motor resuelve un problema de ruteo (*Vehicle Routing Problem*) para identificar y despachar la patrulla más cercana, calculando la trayectoria que cubra la mayor cantidad de zonas rojas en tiempo récord.</p>
+                        </li>
+                        <li style="margin-bottom: 20px;">
+                            <h3 style="color: var(--tsg-success); margin-bottom: 5px;">4. Intervención Física del Entorno</h3>
+                            <p style="margin-top: 0; line-height: 1.5;">El laboratorio envía comandos a la infraestructura IoT: se encienden reflectores y balizas disuasivas preventivamente. El mapa de calor transiciona a <strong style="color: var(--tsg-success);">verde</strong> al reducirse drásticamente la probabilidad del delito.</p>
+                        </li>
+                    </ul>
+                </div>
+                <div class="visual-section">
+                    <img src="img/moto_patrulla.jpg" alt="Motocicleta de patrulla policial" class="tech-img">
+                    <img src="img/mapa_calor_verde.jpg" alt="Mapa de calor mitigado con puntos verdes" class="tech-img">
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="controls">
+        <button onclick="prevSlide()">❮ Anterior</button>
+        <button onclick="nextSlide()">Siguiente ❯</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 7;
+
+        function updateSlides() {
+            for (let i = 1; i <= totalSlides; i++) {
+                const slide = document.getElementById(`slide-${i}`);
+                if (i === currentSlide) {
+                    slide.className = 'slide active';
+                } else if (i < currentSlide) {
+                    slide.className = 'slide previous';
+                } else {
+                    slide.className = 'slide';
+                }
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides) {
+                currentSlide++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 1) {
+                currentSlide--;
+                updateSlides();
+            }
+        }
+
+        // Benchmark Slide Logic
+        function showBenchmark(id, btn) {
+            document.querySelectorAll('.benchmark-display').forEach(el => el.classList.remove('show'));
+            document.querySelectorAll('.btn-use-case').forEach(el => el.classList.remove('active-case'));
+            
+            document.getElementById(`bench-${id}`).classList.add('show');
+            btn.classList.add('active-case');
+        }
+
+        // Architecture Animation Logic
+        function animateArchitecture() {
+            const nodes = [1, 2, 3, 4];
+            let delay = 0;
+            
+            nodes.forEach(n => document.getElementById(`node-${n}`).classList.remove('active-node'));
+            document.getElementById('node-3').style.background = 'var(--tsg-accent)';
+
+            nodes.forEach((n) => {
+                setTimeout(() => {
+                    document.getElementById(`node-${n}`).classList.add('active-node');
+                    if(n === 3) document.getElementById('node-3').style.background = 'var(--tsg-success)';
+                }, delay);
+                delay += 800; 
+            });
+        }
+    </script>
+</body>
+</html>
